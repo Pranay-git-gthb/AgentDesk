@@ -1,4 +1,5 @@
-from fastapi import APIRouter, UploadFile
+from fastapi import APIRouter, UploadFile, File, HTTPException
+from pathlib import Path
 import shutil
 
 from app.services.pdf_service import extract_pdf_info
@@ -7,17 +8,27 @@ router = APIRouter()
 
 
 @router.post("/upload-pdf")
-async def upload_pdf(file: UploadFile):
+def upload_pdf(file: UploadFile = File(...)):
 
-    file_path = f"uploads/{file.filename}"
+    upload_dir = Path("uploads")
+    upload_dir.mkdir(parents=True, exist_ok=True)
 
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    filename = Path(file.filename).name
+    if not filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files are supported")
 
-    pdf_info = extract_pdf_info(file_path)
+    file_path = upload_dir / filename
+
+    try:
+        with file_path.open("wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+    finally:
+        file.file.close()
+
+    pdf_info = extract_pdf_info(str(file_path))
 
     return {
-        "filename": file.filename,
+        "filename": filename,
         "pages": pdf_info["pages"],
-        "characters": len(pdf_info["text"])
+        "characters": len(pdf_info["text"]),
     }
