@@ -23,4 +23,7 @@ async def upload_pdf(file: UploadFile):
     "chunks": pdf_info["chunks"],
     "embedding_count": pdf_info["embedding_count"],
     "embedding_dimension": pdf_info["embedding_dimension"]
-}
+}                  
+
+
+

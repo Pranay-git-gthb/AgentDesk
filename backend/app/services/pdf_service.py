@@ -19,9 +19,9 @@ def extract_pdf_info(pdf_path):
     embeddings = generate_embeddings(chunks)
 
     return {
-    "pages": len(reader.pages),
-    "characters": len(text),
-    "chunks": len(chunks),
-    "embedding_count": len(embeddings),
-    "embedding_dimension": len(embeddings[0])
-}
+        "pages": len(reader.pages),
+        "characters": len(text),
+        "chunks": len(chunks),
+        "embedding_count": len(embeddings),
+        "embedding_dimension": len(embeddings[0])
+    }
