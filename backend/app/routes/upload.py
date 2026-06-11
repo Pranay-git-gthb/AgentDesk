@@ -17,7 +17,10 @@ async def upload_pdf(file: UploadFile):
     pdf_info = extract_pdf_info(file_path)
 
     return {
-        "filename": file.filename,
-        "pages": pdf_info["pages"],
-        "characters": len(pdf_info["text"])
-    }
+    "filename": file.filename,
+    "pages": pdf_info["pages"],
+    "characters": pdf_info["characters"],
+    "chunks": pdf_info["chunks"],
+    "embedding_count": pdf_info["embedding_count"],
+    "embedding_dimension": pdf_info["embedding_dimension"]
+}
