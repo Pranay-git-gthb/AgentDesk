@@ -1,19 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import chat
+from app.routes.upload import router as upload_router
+from app.routers.chat import router as chat_router
 
-# Create FastAPI app instance
+
 app = FastAPI(
     title="NexusAI Support Bot API",
-    description="Backend API for NexusAI multi-agent customer support bot",
-    version="0.1.0"
+    description="Multi-agent customer support backend",
+    version="0.1.0",
 )
-
-# ── CORS Middleware ─────────────────────────────────────
-# Allows React frontend (port 5173) to talk to
-# this FastAPI backend (port 8000)
-
-# Without this the browser blocks all requests
 
 app.add_middleware(
     CORSMiddleware,
@@ -23,14 +18,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ── Routes ──────────────────────────────────────────────
+app.include_router(upload_router)
+app.include_router(chat_router)
+
+
+@app.get("/")
+def home():
+    return {"message": "Welcome to AgentDesk API"}
+
 
 @app.get("/health")
 def health():
-    """Health check - confirms server is running"""
-    return {"status": "ok", "message": "NexusAI backend is live"}
-
-
-# Include chat router
-# Adds all routes from app/routers/chat.py
-app.include_router(chat.router)
+    return {
+        "status": "ok",
+        "message": "NexusAI backend is live",
+    }
