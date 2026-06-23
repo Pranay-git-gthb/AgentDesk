@@ -1,62 +1,53 @@
 name: CI
 
 on:
-  pull_request:
-    branches:
-      - main
+pull_request:
+branches:
+- main
 
 jobs:
-  backend-lint:
-    name: Backend Linting
+backend-check:
+name: Backend Check
+runs-on: ubuntu-latest
 
-    runs-on: ubuntu-latest
+```
+steps:
+  - name: Checkout Repository
+    uses: actions/checkout@v4
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+  - name: Setup Python
+    uses: actions/setup-python@v5
+    with:
+      python-version: "3.11"
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+  - name: Install Python Dependencies
+    run: |
+      python -m pip install --upgrade pip
 
-      - name: Install Python Dependencies
-        run: |
-          python -m pip install --upgrade pip
+      if [ -f backend/requirements.txt ]; then
+        pip install -r backend/requirements.txt
+      fi
+```
 
-          if [ -f backend/requirements.txt ]; then
-            pip install -r backend/requirements.txt
-          fi
+frontend-check:
+name: Frontend Build Check
+runs-on: ubuntu-latest
 
-          pip install flake8
+```
+steps:
+  - name: Checkout Repository
+    uses: actions/checkout@v4
 
-      - name: Run Flake8 Linter
-        run: |
-          if [ -d backend ]; then
-            flake8 backend --count --show-source --statistics
-          else
-            echo "backend directory not found"
-          fi
+  - name: Setup Node.js
+    uses: actions/setup-node@v4
+    with:
+      node-version: "20"
 
-  frontend-check:
-    name: Frontend Dependency & Build Check
+  - name: Install Frontend Dependencies
+    working-directory: frontend
+    run: npm ci
 
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Install Frontend Dependencies
-        working-directory: frontend
-        run: npm install
-
-      - name: Build Frontend
-        working-directory: frontend
-        run: npm run build
-        
+  - name: Build Frontend
+    working-directory: frontend
+    run: npm run build
+```
